@@ -8,9 +8,15 @@ A macOS utility that turns Caps Lock into a Hyper Key — one key that sends ⌘
 
 ## Installation
 
-1. Double-click `HyperCaps.app` to launch it (or build from source — see below)
-2. A Caps Lock icon appears in your menu bar
-3. Grant Accessibility permission when prompted
+Two formats on every release — both signed and notarised, pick whichever suits:
+
+- **[Installer (`.pkg`)](https://github.com/PerpetualBeta/HyperCaps/releases/latest/download/HyperCaps.pkg)** — recommended for first-time installs. Double-click to run; macOS Installer places the app in `/Applications` without quarantine or App Translocation.
+- **[Download (`.zip`)](https://github.com/PerpetualBeta/HyperCaps/releases/latest)** — unzip and drag `HyperCaps.app` to your Applications folder.
+
+After installation:
+
+1. Launch HyperCaps — a Caps Lock icon appears in your menu bar
+2. Grant Accessibility permission when prompted
 
 ## How It Works
 
