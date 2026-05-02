@@ -64,7 +64,7 @@ struct HyperCapsSettingsContent: View {
             }
         }
 
-        MenuBarPillSettings()
+        MenuBarPillSettings { delegate.updateIcon() }
     }
 
     private func hasOtherModifier(excluding: String) -> Bool {
