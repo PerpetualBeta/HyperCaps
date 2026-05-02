@@ -33,7 +33,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     // MARK: - Lifecycle
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        UserDefaults.standard.register(defaults: ["menuBarPillEnabled": true])
         migrateLegacyPillColorKey()
 
         NSApp.setActivationPolicy(.accessory)
