@@ -47,8 +47,9 @@ Click the icon to access:
 - **Hyper Key Active** — toggle the engine on/off
 - **Caps Lock status** — current on/off state
 - **Modifier display** — shows which modifiers are being sent
+- **Check for Updates…** — Sparkle-driven update check
 - **Settings** — configure modifiers and permissions
-- **About** — version info and update check
+- **About** — version info
 
 ## Settings
 
@@ -68,7 +69,8 @@ Choose which modifiers the Hyper Key sends. All four are enabled by default, but
 - **Accessibility** — permission status and grant button
 - **Menu bar icon pill** — optional grey background for stronger contrast on busy or wallpaper-tinted menu bars (off by default)
 - **Launch at Login** — start automatically when you log in
-- **Auto-update** — check for new versions on a configurable schedule with optional automatic installation
+
+Auto-updates are handled by Sparkle. Use the **Check for Updates…** entry in the menu to check on demand; Sparkle's prompt offers an "Automatically download and install updates in the future" checkbox the first time an update is available.
 
 ## Permissions
 
