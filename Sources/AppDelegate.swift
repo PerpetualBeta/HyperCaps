@@ -11,7 +11,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     private var statusItem: NSStatusItem!
     let engine = HyperCapsEngine()
-    let updateChecker = JorvikUpdateChecker(repoName: "HyperCaps")
     let sparkleUserDriverDelegate = HyperCapsUserDriverDelegate()
     lazy var sparkleUpdater = SPUStandardUpdaterController(
         startingUpdater: true,
@@ -48,11 +47,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         updateIcon()
-        // Sparkle handles update polling now. JorvikUpdateChecker instance
-        // remains because JorvikSettingsView.showWindow still requires one
-        // as a parameter, pending JorvikKit retirement (§11.5).
         _ = sparkleUpdater  // forces lazy init so Sparkle starts at launch
-        // updateChecker.checkOnSchedule()  // disabled — Sparkle owns this now
 
         let menu = NSMenu()
         menu.delegate = self
@@ -239,10 +234,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     @objc private func openSettings() {
         let delegate = self
-        JorvikSettingsView.showWindow(
-            appName: "HyperCaps",
-            updateChecker: updateChecker
-        ) {
+        JorvikSettingsView.showWindow(appName: "HyperCaps") {
             HyperCapsSettingsContent(delegate: delegate)
         }
     }
