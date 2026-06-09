@@ -67,8 +67,11 @@ Choose which modifiers the Hyper Key sends. All four are enabled by default, but
 ### General
 
 - **Accessibility** — permission status and grant button
+- **Show icon in menu bar** — hide the Caps Lock status icon while HyperCaps keeps running and remapping keys in the background. Your choice persists across launches, including login auto-start. *Shown only on macOS 14–15 — on macOS 26 (Tahoe) and later, use System Settings → Menu Bar, which provides this natively.*
 - **Menu bar icon pill** — optional grey background for stronger contrast on busy or wallpaper-tinted menu bars (off by default)
 - **Launch at Login** — start automatically when you log in
+
+If you've hidden the status icon and want it back, simply re-open HyperCaps from your Applications folder — it reappears immediately.
 
 Auto-updates are handled by Sparkle. Use the **Check for Updates…** entry in the menu to check on demand; Sparkle's prompt offers an "Automatically download and install updates in the future" checkbox the first time an update is available.
 
