@@ -9,7 +9,7 @@ import Sparkle
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
-    private var statusItem: NSStatusItem!
+    private var statusItem: NSStatusItem?
     let engine = HyperCapsEngine()
     let sparkleUserDriverDelegate = HyperCapsUserDriverDelegate()
     lazy var sparkleUpdater = SPUStandardUpdaterController(
@@ -45,13 +45,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         HyperCapsEngine.installCleanupHandlers()
 
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        updateIcon()
+        createStatusItem()
         _ = sparkleUpdater  // forces lazy init so Sparkle starts at launch
-
-        let menu = NSMenu()
-        menu.delegate = self
-        statusItem.menu = menu
 
         // Check for conflicting system-level Caps Lock remap
         if HyperCapsEngine.capsLockHasSystemRemap() {
@@ -73,10 +68,45 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         ) { [weak self] _ in
             Task { @MainActor in self?.updateIcon() }
         }
+
+        // Create or remove the status item when the user toggles its
+        // visibility in Settings.
+        NotificationCenter.default.addObserver(
+            forName: JorvikStatusItemVisibility.didChangeNotification,
+            object: nil, queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in self?.applyStatusItemVisibility() }
+        }
     }
 
     func applicationWillTerminate(_ notification: Notification) {
         Task { await engine.stop() }
+    }
+
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        JorvikStatusItemVisibility.handleReopen()
+        return true
+    }
+
+    // MARK: - Status item
+
+    func createStatusItem() {
+        guard JorvikStatusItemVisibility.isVisible else { return }
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        updateIcon()
+
+        let menu = NSMenu()
+        menu.delegate = self
+        statusItem?.menu = menu
+    }
+
+    func applyStatusItemVisibility() {
+        if JorvikStatusItemVisibility.isVisible {
+            if statusItem == nil { createStatusItem() }
+        } else if let item = statusItem {
+            NSStatusBar.system.removeStatusItem(item)
+            statusItem = nil
+        }
     }
 
     // One-shot removal of the user-chosen pill colour key from the old design.
@@ -119,7 +149,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     func updateIcon() {
         let symbolName = engine.isActive ? "capslock.fill" : "capslock"
-        statusItem.button?.image = JorvikMenuBarPill.icon(
+        statusItem?.button?.image = JorvikMenuBarPill.icon(
             symbolName: symbolName,
             accessibilityDescription: "HyperCaps"
         )

@@ -64,6 +64,8 @@ struct HyperCapsSettingsContent: View {
             }
         }
 
+        MenuBarVisibilitySettings()
+
         MenuBarPillSettings { delegate.updateIcon() }
     }
 
