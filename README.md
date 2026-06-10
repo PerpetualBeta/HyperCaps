@@ -133,4 +133,4 @@ The LED toggle requires Shift + Caps Lock (a bare tap). If you pressed another k
 
 ---
 
-HyperCaps is provided by [Jorvik Software](https://jorviksoftware.cc/utilities/hypercaps). If you find it useful, consider [buying me a coffee](https://jorviksoftware.cc/donate).
+HyperCaps is provided by [Jorvik Software](https://jorviksoftware.cc/). If you find it useful, consider [buying me a coffee](https://jorviksoftware.cc/donate).
