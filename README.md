@@ -13,6 +13,12 @@ Two formats on every release — both signed and notarised, pick whichever suits
 - **[Installer (`.pkg`)](https://github.com/PerpetualBeta/HyperCaps/releases/latest/download/HyperCaps.pkg)** — recommended for first-time installs. Double-click to run; macOS Installer places the app in `/Applications` without quarantine or App Translocation.
 - **[Download (`.zip`)](https://github.com/PerpetualBeta/HyperCaps/releases/latest)** — unzip and drag `HyperCaps.app` to your Applications folder.
 
+Or install it with [Homebrew](https://brew.sh):
+
+```sh
+brew install --cask perpetualbeta/jorvik/hypercaps
+```
+
 After installation:
 
 1. Launch HyperCaps — a Caps Lock icon appears in your menu bar
