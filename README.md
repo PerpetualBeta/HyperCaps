@@ -101,13 +101,16 @@ HyperCaps will alert you on launch if it detects a conflicting system-level rema
 
 HyperCaps uses Swift Package Manager. No Xcode project is required.
 
+The build is driven by the shared [`release.mk`](https://github.com/PerpetualBeta/jorvik-release) Make include, so `jorvik-release` has to be checked out **beside this repo** — the Makefile looks for it at `../jorvik-release/`. macOS ships GNU Make 3.81 as `make`, which is too old, so `gmake` comes from Homebrew.
+
 ```bash
-cd ~/Desktop/"Jorvik Software"/HyperCaps
+brew install make   # GNU Make 4+, if you do not already have gmake
+git clone https://github.com/PerpetualBeta/jorvik-release.git
+git clone https://github.com/PerpetualBeta/HyperCaps.git
+cd HyperCaps
 gmake build
 open .build/HyperCaps.app
 ```
-
-Requires GNU Make 4.x — `brew install make` installs it as `gmake`. The target is defined in the shared `release.mk` from `jorvik-release/`.
 
 ## How It Works (Technical)
 
