@@ -1,6 +1,6 @@
 # HyperCaps
 
-A macOS utility that turns Caps Lock into a Hyper Key — one key that sends ⌘⌃⌥⇧ simultaneously. Create powerful, conflict-free keyboard shortcuts for any app.
+A macOS utility that turns Caps Lock into a Hyper Key — one key that sends `control` `option` `shift` `command` simultaneously. Create powerful, conflict-free keyboard shortcuts for any app.
 
 ## Requirements
 
@@ -30,10 +30,10 @@ HyperCaps remaps Caps Lock at the HID level so it acts as a modifier key rather 
 
 | You press | macOS receives |
 |-----------|----------------|
-| Caps Lock + E | ⌘⌃⌥⇧E |
-| Caps Lock + Space | ⌘⌃⌥⇧Space |
+| Caps Lock + E | `control` `option` `shift` `command` `E` |
+| Caps Lock + Space | `control` `option` `shift` `command` `space` |
 | Caps Lock alone | Nothing (consumed silently) |
-| ⇧ + Caps Lock | Toggles Caps Lock on/off |
+| `shift` + Caps Lock | Toggles Caps Lock on/off |
 
 Caps Lock alone does nothing. It sits silently until you combine it with another key, giving you a completely new layer of keyboard shortcuts.
 
@@ -65,10 +65,10 @@ Choose which modifiers the Hyper Key sends. All four are enabled by default, but
 
 | Modifier | Default |
 |----------|---------|
-| Command (⌘) | On |
-| Control (⌃) | On |
-| Option (⌥) | On |
-| Shift (⇧) | On |
+| Command (`command`) | On |
+| Control (`control`) | On |
+| Option (`option`) | On |
+| Shift (`shift`) | On |
 
 ### General
 
