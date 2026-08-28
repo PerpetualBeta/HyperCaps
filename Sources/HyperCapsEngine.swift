@@ -62,7 +62,7 @@ private func hyperKeyTapCallback(
         if let tap = _hyperEventTap {
             CGEvent.tapEnable(tap: tap, enable: true)
         }
-        return Unmanaged.passRetained(event)
+        return Unmanaged.passUnretained(event)
     }
 
     let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
@@ -100,16 +100,16 @@ private func hyperKeyTapCallback(
     if _hyperActive && type == .keyDown {
         _keyPressedDuringHyper = true
         event.flags = event.flags.union(_hyperModifiers)
-        return Unmanaged.passRetained(event)
+        return Unmanaged.passUnretained(event)
     }
 
     if _hyperActive && type == .keyUp {
         event.flags = event.flags.union(_hyperModifiers)
-        return Unmanaged.passRetained(event)
+        return Unmanaged.passUnretained(event)
     }
 
     // Pass everything else through unchanged
-    return Unmanaged.passRetained(event)
+    return Unmanaged.passUnretained(event)
 }
 
 // MARK: - HyperCapsEngine
