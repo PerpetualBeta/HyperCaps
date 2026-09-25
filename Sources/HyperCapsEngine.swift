@@ -1,5 +1,6 @@
 import AppKit
 import ApplicationServices
+import Carbon.HIToolbox
 import IOKit
 import IOKit.hid
 
@@ -12,6 +13,28 @@ private var _hyperModifiers: CGEventFlags = [.maskCommand, .maskControl, .maskSh
 private var _shiftHeldWhenHyperPressed = false
 private var _onShiftTap: (() -> Void)?
 private let _f18KeyCode: Int64 = 79
+
+// Media keys arrive as system-defined events, not key presses, and no hotkey API
+// can bind them. While hyper is held, each one is re-sent as the function key it
+// is printed on, so hyper + ⏮ becomes a bindable hyper + F7.
+private let _systemDefinedEventType = CGEventType(rawValue: UInt32(NX_SYSDEFINED))!
+private let _mediaKeyFunctionKeys: [Int32: CGKeyCode] = [
+    NX_KEYTYPE_BRIGHTNESS_DOWN:   CGKeyCode(kVK_F1),
+    NX_KEYTYPE_BRIGHTNESS_UP:     CGKeyCode(kVK_F2),
+    NX_KEYTYPE_ILLUMINATION_DOWN: CGKeyCode(kVK_F5),
+    NX_KEYTYPE_ILLUMINATION_UP:   CGKeyCode(kVK_F6),
+    NX_KEYTYPE_PREVIOUS:          CGKeyCode(kVK_F7),
+    NX_KEYTYPE_REWIND:            CGKeyCode(kVK_F7),
+    NX_KEYTYPE_PLAY:              CGKeyCode(kVK_F8),
+    NX_KEYTYPE_NEXT:              CGKeyCode(kVK_F9),
+    NX_KEYTYPE_FAST:              CGKeyCode(kVK_F9),
+    NX_KEYTYPE_MUTE:              CGKeyCode(kVK_F10),
+    NX_KEYTYPE_SOUND_DOWN:        CGKeyCode(kVK_F11),
+    NX_KEYTYPE_SOUND_UP:          CGKeyCode(kVK_F12),
+]
+// Media keys whose press went out as a function key, so the release does too,
+// even if hyper was let go in between.
+private var _mediaKeysSentAsFunctionKeys: Set<Int32> = []
 
 // MARK: - Cleanup helpers (module-level for C function pointer compatibility)
 
@@ -96,6 +119,11 @@ private func hyperKeyTapCallback(
         return nil // consume
     }
 
+    // --- Media key: re-send as its function key while hyper is active ---
+    if type == _systemDefinedEventType {
+        return handleMediaKey(proxy: proxy, event: event)
+    }
+
     // --- Any other key while hyper is active: inject modifier flags ---
     if _hyperActive && type == .keyDown {
         _keyPressedDuringHyper = true
@@ -110,6 +138,44 @@ private func hyperKeyTapCallback(
 
     // Pass everything else through unchanged
     return Unmanaged.passUnretained(event)
+}
+
+private func handleMediaKey(proxy: CGEventTapProxy, event: CGEvent) -> Unmanaged<CGEvent>? {
+    guard let nsEvent = NSEvent(cgEvent: event),
+          nsEvent.subtype.rawValue == Int16(NX_SUBTYPE_AUX_CONTROL_BUTTONS) else {
+        return Unmanaged.passUnretained(event)
+    }
+
+    // data1 packs the media key in the high 16 bits and its state in the low 16:
+    // the key-down/up message in bits 8–15 and the auto-repeat flag in bit 0.
+    let data1 = nsEvent.data1
+    let mediaKey = Int32((data1 & 0xFFFF0000) >> 16)
+    let keyMessage = Int32((data1 & 0xFF00) >> 8)
+    let isRepeat = data1 & 0x1 != 0
+    let isDown = keyMessage == NX_KEYDOWN
+
+    guard let functionKey = _mediaKeyFunctionKeys[mediaKey] else {
+        if _hyperActive { _keyPressedDuringHyper = true }
+        return Unmanaged.passUnretained(event)
+    }
+
+    if isDown {
+        guard _hyperActive else { return Unmanaged.passUnretained(event) }
+        _keyPressedDuringHyper = true
+        _mediaKeysSentAsFunctionKeys.insert(mediaKey)
+    } else {
+        guard _mediaKeysSentAsFunctionKeys.remove(mediaKey) != nil else {
+            return Unmanaged.passUnretained(event)
+        }
+    }
+
+    guard let keyEvent = CGEvent(keyboardEventSource: nil, virtualKey: functionKey, keyDown: isDown) else {
+        return Unmanaged.passUnretained(event)
+    }
+    keyEvent.flags = event.flags.union(_hyperModifiers)
+    if isRepeat { keyEvent.setIntegerValueField(.keyboardEventAutorepeat, value: 1) }
+    keyEvent.tapPostEvent(proxy)
+    return nil // consume the media key
 }
 
 // MARK: - HyperCapsEngine
@@ -189,6 +255,7 @@ final class HyperCapsEngine {
         _hyperActive = false
         _keyPressedDuringHyper = false
         _shiftHeldWhenHyperPressed = false
+        _mediaKeysSentAsFunctionKeys.removeAll()
         await removeHIDRemap()
     }
 
@@ -255,6 +322,7 @@ final class HyperCapsEngine {
         let mask: CGEventMask = (1 << CGEventType.keyDown.rawValue)
                               | (1 << CGEventType.keyUp.rawValue)
                               | (1 << CGEventType.flagsChanged.rawValue)
+                              | (1 << _systemDefinedEventType.rawValue)
 
         guard let tap = CGEvent.tapCreate(
             tap: .cgSessionEventTap,

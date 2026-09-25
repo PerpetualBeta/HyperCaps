@@ -32,10 +32,13 @@ HyperCaps remaps Caps Lock at the HID level so it acts as a modifier key rather 
 |-----------|----------------|
 | Caps Lock + E | `control` `option` `shift` `command` `E` |
 | Caps Lock + Space | `control` `option` `shift` `command` `space` |
+| Caps Lock + ⏮ (a media key) | `control` `option` `shift` `command` `F7` |
 | Caps Lock alone | Nothing (consumed silently) |
 | `shift` + Caps Lock | Toggles Caps Lock on/off |
 
 Caps Lock alone does nothing. It sits silently until you combine it with another key, giving you a completely new layer of keyboard shortcuts.
+
+Media keys work too. Brightness, keyboard backlight, playback and volume keys are not ordinary key presses, and no app can bind them as a shortcut. With Caps Lock held, HyperCaps sends the function key printed on each one instead, so Caps Lock + ⏮ reaches your apps as a Hyper + `F7` shortcut and the track does not change.
 
 ## Caps Lock Toggle
 
@@ -117,7 +120,7 @@ open .build/HyperCaps.app
 HyperCaps operates in three layers:
 
 1. **HID remap** — uses `hidutil` to remap Caps Lock (USB usage `0x39`) to F18 (`0x6D`) at the hardware input level
-2. **CGEvent tap** — a global event tap intercepts F18 key events and injects the configured modifier flags into any key pressed while F18 is held
+2. **CGEvent tap** — a global event tap intercepts F18 key events and injects the configured modifier flags into any key pressed while F18 is held. Media keys arrive as system-defined events, so while F18 is held the tap consumes them and posts the matching function key (⏮ → F7, ⏯ → F8, ⏭ → F9, and so on) with the modifier flags added
 3. **IOKit** — directly toggles the physical Caps Lock LED state for the Shift+Caps Lock toggle
 
 The `hidutil` remap is cleaned up on quit, and safety handlers ensure cleanup on SIGTERM, SIGINT, and atexit. All blocking operations (process spawning) run on background threads to keep the main run loop responsive.
